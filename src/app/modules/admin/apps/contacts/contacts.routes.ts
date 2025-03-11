@@ -11,6 +11,7 @@ import { ContactsDetailsComponent } from 'app/modules/admin/apps/contacts/detail
 import { ContactsListComponent } from 'app/modules/admin/apps/contacts/list/list.component';
 import { catchError, throwError } from 'rxjs';
 import { BulkUpdateComponent } from './bulk-update/bulk-update.component';
+import { UserService } from 'app/shared/api/services/api';
 
 /**
  * Contact resolver
@@ -93,8 +94,9 @@ export default [
                 path: '',
                 component: ContactsListComponent,
                 resolve: {
-                    contacts: () => inject(ContactsService).getContacts(),
+                    contacts: () => inject(UserService).listAllUsersUserAdminListAllUsersGet(),
                     countries: () => inject(ContactsService).getCountries(),
+                    dummycontacts: () => inject(ContactsService).getContacts(),
                 },
                 children: [
                     {
