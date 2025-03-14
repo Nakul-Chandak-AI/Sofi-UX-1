@@ -3,6 +3,7 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    inject,
     Inject,
     OnDestroy,
     OnInit,
@@ -105,29 +106,8 @@ export class ContactsListComponent implements OnInit, OnDestroy {
      * On init
      */
     ngOnInit(): void {
-        // Get the contacts
-        this.contacts$ = this._userService.contacts$;
-        this._userService.contacts$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((contacts: Contact[]) => {
-                // Update the counts
-                this.contactsCount = contacts.length;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get the contact
-        this._userService.contact$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((contact: Contact) => {
-                // Update the selected contact
-                this.selectedContact = contact;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
+        
+        this.getConactData();
         // Get the countries
         this._contactsService.countries$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -153,7 +133,8 @@ export class ContactsListComponent implements OnInit, OnDestroy {
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
             if (!opened) {
-                // Remove the selected contact when drawer closed
+                this.ngOnInit();
+                // ct when drawer closed
                 this.selectedContact = null;
 
                 // Mark for check
@@ -191,6 +172,32 @@ export class ContactsListComponent implements OnInit, OnDestroy {
             });
     }
 
+    getConactData() {
+        // Get the contacts
+        this.contacts$ = this._userService.contacts$;
+            
+        this._userService.contacts$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((contacts: Contact[]) => {
+                // Update the counts
+                this.contactsCount = contacts.length;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Get the contact
+        this._userService.contact$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((contact: Contact) => {
+                // Update the selected contact
+                this.selectedContact = contact;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
     /**
      * On destroy
      */
@@ -219,7 +226,7 @@ export class ContactsListComponent implements OnInit, OnDestroy {
      * Create contact
      */
     createContact(): void {
-        this._userService.iseditUserMode = true;
+        this._userService.iseditUserMode = "";
         this._router.navigate(['./', ""], {
             relativeTo: this._activatedRoute,
         });
@@ -231,11 +238,10 @@ export class ContactsListComponent implements OnInit, OnDestroy {
      * Create contact
      */
        editContact(id:string): void {
-        this._userService.iseditUserMode = false;
+        this._userService.iseditUserMode = id;
         this._router.navigate(['./', id], {
             relativeTo: this._activatedRoute,
         });
-        // Create the contact
         this._changeDetectorRef.markForCheck();
     }
 

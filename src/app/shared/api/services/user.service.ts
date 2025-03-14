@@ -32,19 +32,24 @@ import { User } from 'app/core/user/user.types';
 import { Contact } from 'app/modules/admin/apps/contacts/contacts.types';
 import { environment } from 'environments/environment';
 
-
 @Injectable({ providedIn: 'root' })
 export class UserService {
 
     private httpClient = inject(HttpClient);
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
-    private _userEditMode: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+    private _userEditMode: ReplaySubject<string> = new ReplaySubject<string>();
     private _contacts: BehaviorSubject<Contact[] | null> = new BehaviorSubject(
         null
     );
     private _contact: BehaviorSubject<Contact | null> = new BehaviorSubject(
         null
     );
+
+    private _roles: BehaviorSubject<Array<string> | null> = new BehaviorSubject(
+        null
+    );
+    
+
     /**
          * Getter for contact
          */
@@ -57,6 +62,14 @@ export class UserService {
      */
     get contacts$(): Observable<Contact[]> {
         return this._contacts.asObservable();
+    }
+
+    /**
+     *  Getter list of roles
+     */
+
+    get roles$():Observable<Array<string>> {
+        return this._roles.asObservable();
     }
 
     /**
@@ -73,11 +86,11 @@ export class UserService {
         return this._user.asObservable();
     }
 
-    set iseditUserMode(value:boolean) {
+    set iseditUserMode(value:string) {
         this._userEditMode.next(value);
     }
 
-    get iseditUserMode$(): Observable<boolean> {
+    get iseditUserMode$(): Observable<string> {
         return this._userEditMode.asObservable();
     }
 
@@ -196,7 +209,9 @@ export class UserService {
                 observe: observe,
                 reportProgress: reportProgress
             }
-        );
+        ).pipe(tap((roles) => {
+            this._roles.next(roles);
+        }));
     }
 
     /**
@@ -565,7 +580,11 @@ export class UserService {
                 observe: observe,
                 reportProgress: reportProgress
             }
-        );
+        ).pipe( switchMap((response: any) => {
+            
+
+            return of(response);
+        }));
     }
 
      /**
