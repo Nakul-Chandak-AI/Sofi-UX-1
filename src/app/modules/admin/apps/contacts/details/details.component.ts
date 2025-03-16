@@ -334,9 +334,11 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
                 });
             //return;
         }
+        // Revoke User Access
         else if (!revoked && approved) {
             this.revokeAccess(true,true);
         }
+        // Approve Revoke User Access
         else if (revoked && verified) {
             const revokeData = <ModelUserApproveAccess>{
                 user_id_list: [this.contact._id],
@@ -357,11 +359,12 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
 
                         // Show the alert
                         this.showAlert = true;
-
+                        this.hideAlert();
                         //this.modifiyRoles();
                         this.contact.name = contact.name;
                         this.contact.email = contact.email;
                         this.contact.roles = contact.roles;
+                        this.contact.approved = true;
                         this.revokeAccess (false, false);
                     }, error: (_error) => {
                         this.toggleEditMode(false);
@@ -380,9 +383,11 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
 
                         // Show the alert
                         this.showAlert = true;
+                        this.hideAlert();
                     }
                 });
         }
+         // Approving new user access
         else if (verified && !approved && !revoked) {
             const approveUserData = <ModelUserApproveAccess>{
                 user_id_list: [this.contact._id],
@@ -409,6 +414,8 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
                         this.contact.name = contact.name;
                         this.contact.email = contact.email;
                         this.contact.roles = contact.roles;
+                        this.contact.approved = true;
+                        this.hideAlert();
                     }, error: (_error) => {
                         this.toggleEditMode(false);
 
@@ -426,6 +433,7 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
 
                         // Show the alert
                         this.showAlert = true;
+                        this.hideAlert();
                     }
                 });
         }
@@ -450,6 +458,7 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
                             message: `Access has been revoked successfully.`,
                         };
                     }
+                    this.contact.revoked = revoke;
                         // Show the alert
                       
                         //this.modifiyRoles();
@@ -499,6 +508,7 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
                     this.contact.name = contact.name;
                     this.contact.email = contact.email;
                     this.contact.roles = contact.roles;
+                    this.hideAlert();
                 }, error: (_error) => {
                     // Toggle the edit mode off
                     this.toggleEditMode(false);
@@ -517,6 +527,7 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
 
                     // Show the alert
                     this.showAlert = true;
+                    this.hideAlert();
                 }
             });
     }
@@ -988,5 +999,12 @@ export class ContactsDetailsComponent implements OnInit, OnDestroy {
             var index = roleControls.controls.findIndex(x => x.value === role);
             roleControls.removeAt(index);
         }
+    }
+
+    hideAlert() {
+        setTimeout(() => {
+           this.showAlert = false;
+           this._changeDetectorRef.markForCheck();
+          }, 3000)
     }
 }
