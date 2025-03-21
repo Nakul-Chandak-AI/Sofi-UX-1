@@ -83,7 +83,7 @@
                             </button>
                             }
 
-                            <button mat-menu-item [disabled] ="!selectAllContacts && !indeterminate" (click)="bulkUserRevoke(false)">
+                            <button mat-menu-item [disabled] ="!selectAllContacts && !indeterminate" (mouseover)="isApproveTrigger=true" [matMenuTriggerFor]="multiRoles">
                               <mat-icon>group_add</mat-icon>
                               <span>Approve</span>
                             </button>
@@ -91,10 +91,26 @@
                               <mat-icon>group_remove</mat-icon>
                               <span>Revoke</span>
                             </button>
-                            <!-- <button mat-menu-item [disabled] ="!selectAllContacts && !indeterminate">
-                              <mat-icon>notifications_off</mat-icon>
-                              <span>reinstead</span>
-                            </button> -->
+
+                            <button mat-menu-item [disabled] ="!selectAllContacts && !indeterminate" (click)="bulkUserRevoke(false)">
+                                <mat-icon>group_add</mat-icon>
+                                <span>Reinstead</span>
+                              </button>
+
+                              <button mat-menu-item [disabled] ="!selectAllContacts && !indeterminate" (mouseover)="isApproveTrigger=false" [matMenuTriggerFor]="multiRoles">
+                                <mat-icon>group_add</mat-icon>
+                                <span>Update Roles</span>
+                              </button>
+                            </mat-menu>
+
+                          <mat-menu class="listUser" #multiRoles="matMenu" (closed)="resetRoles()">
+                           @for(role of roleList; track role) {
+                            <mat-checkbox class="display-grid" [checked]="role.isSelected" (click)="$event.stopPropagation()" (change)="updateRoles($event.checked,role.name)"
+                             >{{role.name}}</mat-checkbox>
+                           }
+                           <button [disabled] = "isRoleSelected()" class="ml-4" mat-flat-button [color]="'primary'" (click)="bulkUpdateRoles()">
+                            <span class="ml-2 mr-1">Save</span>
+                        </button> 
                           </mat-menu>
 
                     </div>
