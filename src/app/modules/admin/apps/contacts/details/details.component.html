@@ -96,32 +96,32 @@
 
             <div class="mt-2 flex flex-wrap items-center">
                 @if(contact.verified){
-                <div style="background-color: #0061F2 !important;"
-                    class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:text-gray-300">
+                <div style="background-color: #0061F2 !important;margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                    class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:text-gray-300">
                     <span class="whitespace-nowrap text-sm font-medium">Verified</span>
                 </div>
                 }
                 @else{
-                <div
-                    class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                <div style="margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                    class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                     <span class="whitespace-nowrap text-sm font-medium">Not verified</span>
                 </div>
                 }
                 @if(contact.approved && !contact.revoked){
-                <div style="background-color: darkgreen !important;"
-                    class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:text-gray-300">
+                <div style="background-color: darkgreen !important;margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                    class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:text-gray-300">
                     <span class="whitespace-nowrap text-sm font-medium">Approved</span>
                 </div>
                 }
                 @else if(!contact.approved && !contact.revoked){
-                <div style="background-color: rgb(245 158 11 / var(--tw-bg-opacity, 1)) !important;"
-                    class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:text-gray-300">
+                <div style="background-color: rgb(245 158 11 / var(--tw-bg-opacity, 1)) !important;margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                    class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:text-gray-300">
                     <span class="whitespace-nowrap text-sm font-medium">Inactive</span>
                 </div>
                 }
                 @else if((contact.approved && contact.revoked) || contact.revoked){
-                <div
-                    class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                <div style="margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                    class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                     <span class="whitespace-nowrap text-sm font-medium">Revoked</span>
                 </div>
                 }
@@ -176,8 +176,8 @@
                     role of contact.roles;
                     track trackByFn($index, role)
                     ) {
-                    <div
-                        class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                    <div style="margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                        class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                         <span class="whitespace-nowrap text-sm font-medium">{{ role }}</span>
                     </div>
                     }
@@ -382,32 +382,32 @@
 
                 <div class="mt-2 flex flex-wrap items-center">
                     @if(contact.verified){
-                    <div style="background-color: #0061F2 !important;"
-                        class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:text-gray-300">
+                    <div style="background-color: #0061F2 !important;margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                        class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:text-gray-300">
                         <span class="whitespace-nowrap text-sm font-medium">Verified</span>
                     </div>
                     }
                     @else{
-                    <div
-                        class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                    <div style="margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                        class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                         <span class="whitespace-nowrap text-sm font-medium">Not verified</span>
                     </div>
                     }
                     @if(contact.approved && !contact.revoked){
-                    <div style="background-color: darkgreen !important;"
-                        class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:text-gray-300">
+                    <div style="background-color: darkgreen !important;margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                        class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:text-gray-300">
                         <span class="whitespace-nowrap text-sm font-medium">Approved</span>
                     </div>
                     }
                     @else if(!contact.approved && !contact.revoked){
-                    <div style="background-color: rgb(245 158 11 / var(--tw-bg-opacity, 1)) !important;"
-                        class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:text-gray-300">
+                    <div style="background-color: rgb(245 158 11 / var(--tw-bg-opacity, 1)) !important;margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                        class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:text-gray-300">
                         <span class="whitespace-nowrap text-sm font-medium">Inactive</span>
                     </div>
                     }
                     @else if((contact.approved && contact.revoked) || contact.revoked){
-                    <div
-                        class="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                    <div style="margin-bottom: 0.25rem !important;padding-top: 0.10rem !important;padding-bottom: 0.10rem !important;padding-left: 0.5rem !important;padding-right: 0.5rem !important;"
+                        class="mr-3 flex items-center justify-center rounded-full bg-gray-100 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                         <span class="whitespace-nowrap text-sm font-medium">Revoked</span>
                     </div>
                     }
