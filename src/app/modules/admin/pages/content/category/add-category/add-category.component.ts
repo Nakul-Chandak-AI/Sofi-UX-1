@@ -19,7 +19,6 @@ import {
     FormGroupDirective,
     FormsModule,
     ReactiveFormsModule,
-    UntypedFormArray,
     UntypedFormBuilder,
     UntypedFormGroup,
     Validators,
@@ -38,7 +37,9 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
-import { firstValueFrom, Observable, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { ImageCroppedEvent, ImageCropperComponent, LoadedImage  } from 'ngx-image-cropper';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
     selector: 'add-category',
@@ -55,7 +56,8 @@ import { firstValueFrom, Observable, Subject, takeUntil } from 'rxjs';
         MatTooltip,
         MatInputModule,
         MatCheckboxModule,
-        FuseAlertComponent
+        FuseAlertComponent,
+        ImageCropperComponent
     ],
     animations: fuseAnimations,
 })
@@ -70,6 +72,9 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
     @Input() buttonTitle: string = 'Add a card';
     @Output() readonly saved: EventEmitter<string> = new EventEmitter<string>();
 
+    imageChangedEvent: Event | null = null;
+    croppedImage: SafeUrl  = '';
+    
     alert: { type: FuseAlertType; message: string } = {
         type: 'success',
         message: '',
@@ -77,17 +82,24 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
 
     private _tagsPanelOverlayRef: OverlayRef;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-    fileData = "";
     categoryForm: UntypedFormGroup;
     file: File;
     editMode = false;
-    category: Category;
+    category = <Category>{
+        name: "",
+        description: "",
+        tags: [],
+        workflowName: "",
+        photo: ""
+    };
     tags: Array<string> = [];;
     tagsEditMode: boolean = false;
     filteredTags: Array<string> = [];
     showAlert: boolean = false;
     categoryId = "";
     isFormEditMode = false;
+    showCropControl = false;
+    fileName="dummy";
     /**
      * Constructor
      */
@@ -100,7 +112,8 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
         private _overlay: Overlay,
         private _viewContainerRef: ViewContainerRef,
         private _router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private sanitizer: DomSanitizer
     ) { }
 
     // -----------------------------------------------------------------------------------------------------
@@ -112,6 +125,11 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
      */
     ngOnInit(): void {
         this._categoryListComponent.matCategoryDrawer.open();
+
+        this.route.paramMap.subscribe(params => {
+            this.categoryId = params.get('id');
+          });
+
         // Initialize the new list form
         this.categoryForm = this._formBuilder.group({
             name: ['', [Validators.required]],
@@ -119,40 +137,34 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
             description: ['', [Validators.required]],
             tags: []
         });
-        // const categoryId = this.route.snapshot.params['id'];
-        // console.log(categoryId);
 
-        this._contentCategoryService.getCategoryId$.pipe(takeUntil(this._unsubscribeAll)).subscribe((value: string) => {
-            this.categoryId = value;
-            this.resetForm();
-            if (value === "00000000-0000-0000-0000-000000000000" || value === "") {
-                this.isFormEditMode = false;
+        this._contentCategoryService.getCategoryId$.subscribe((value)=> {
+            if(value === "" || value =="00000000-0000-0000-0000-000000000000") {
+                this._changeDetectorRef.markForCheck();
             }
-        });
+        })
 
         this._contentCategoryService.category$.pipe(takeUntil(this._unsubscribeAll))
             .subscribe((cate) => {
-                if (cate && (this.categoryId !== "00000000-0000-0000-0000-000000000000" && this.categoryId !== "")) {
-                    this.isFormEditMode = true;
-                    this.category = cate;
-                    this.categoryForm.patchValue(cate);
-                }
+                    if(!this._categoryListComponent.matCategoryDrawer.opened)
+                        {
+                            this._categoryListComponent.matCategoryDrawer.open();
+                        }
+                           // this.resetForm();
+                           if(this.categoryId != "00000000-0000-0000-0000-000000000000") {
+                            this.isFormEditMode = true;
+                            this.category = cate;
+                            this.categoryForm.patchValue(cate);
+                            if (this.category) {
+                                const tages = this.separateStringIntoArray(this.category.tags);
+                                this.category.tags = tages;
+                                this.filteredTags = this.tags = tages;
+                                // Toggle the edit mode off
+                                this.toggleEditMode(false);
+                            }
+                        }
             });
-
-        if (this.category) {
-            const tages = this.separateStringIntoArray(this.category.tags);
-            this.category.tags = tages;
-            this.filteredTags = this.tags = tages;
-            // Toggle the edit mode off
-            this.toggleEditMode(false);
-        }
-        else {
-            this.resetForm();
-        }
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
-
+    }  
 
     separateStringIntoArray(stringArray) {
         if (!Array.isArray(stringArray) || stringArray.length === 0) {
@@ -213,7 +225,7 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
                         // Go back to the list
                         this._router.navigate(['/category'], { relativeTo: this.route });
                         this.closeDrawer();
-                    }, 3000);
+                    }, 2000);
 
                 }
             }, error: (error) => { this.showError(error); }
@@ -223,22 +235,11 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
     }
 
-    async getFileFromUrl() {
-        const blob = await firstValueFrom(this._contentCategoryService.getUrlToBlobFile(this.category?.photo, this.categoryId));
-        //this.file = new File([blob], this.categoryId, {
-        // type: blob.type,
-        //  });
-    }
-
-    /**
+     /**
      * Update card
      * @param formData 
      */
     async update(formData: FormData): Promise<void> {
-        if (!this.file && this.category?.photo) {
-            await this.getFileFromUrl()
-        }
-
         this._contentCategoryService.updateCategoryContentCategoryUpdatePostForm(formData).subscribe({
             next: (response) => {
                 if (response.status.toLocaleLowerCase() === "success") {
@@ -256,7 +257,7 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
                         // Go back to the list
                         this._router.navigate(['/category'], { relativeTo: this.route });
                         this.closeDrawer();
-                    }, 3000);
+                    }, 2000);
                     this._changeDetectorRef.markForCheck();
                 }
             }, error: (error) => { this.showError(error); }
@@ -293,47 +294,17 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
             workflowName: "",
             photo: ""
         };
-        this.fileData = "";
         this.file = null;
         this.tags = this.filteredTags = [];
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
 
-    /**
- * Upload Files
- *
- * @param fileList
- */
-    uploadFiles(fileList: FileList): void {
-        // Return if canceled
-        if (!fileList.length) {
-            return;
-        }
-
-        const allowedTypes = ['image/jpeg', 'image/png'];
-        this.file = fileList[0];
-
-        // Return if the file is not allowed
-        if (!allowedTypes.includes(this.file.type)) {
-            return;
-        }
-        this.fileToBase64(this.file).then((base64: string) => {
-            this.fileData = base64;
-            this._changeDetectorRef.markForCheck();
-        });
+    removeFile(): void { 
+        this.croppedImage = '';
+        this.showCropControl = false;
+        this.imageChangedEvent = null;
     }
-
-    fileToBase64(file: File): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = error => reject(error);
-        });
-    }
-
-    removeFile(): void { }
 
     /**
      * Open tags panel
@@ -617,5 +588,35 @@ export class CategoryAddCardComponent implements OnInit, OnDestroy {
         this._unsubscribeAll.complete();
     }
 
+    fileChangeEvent(event: any): void {
+        this.imageChangedEvent = event;
+        this.fileName = event.target.files[0].name; // Get the file name
+        this.showCropControl = true;
+        this.croppedImage ='';
+    }
 
+    imageCropped(event: ImageCroppedEvent) {
+        this.convertBlobToFile(event.blob)
+        this.croppedImage = this.sanitizer.bypassSecurityTrustUrl(event.objectUrl);
+        // event.blob can be used to upload the cropped image
+      }
+
+    imageLoaded(image: LoadedImage) {
+    // show cropper
+    }
+    cropperReady() {
+    // cropper ready
+    }
+    loadImageFailed() {
+    // show message
+    }
+
+    convertBlobToFile(blob: Blob) {
+        const file = new File([blob], this.fileName, { type: blob.type });
+        this.file = file;
+      }
+
+    cropImage() {
+        this.showCropControl = false;
+    }
 }
