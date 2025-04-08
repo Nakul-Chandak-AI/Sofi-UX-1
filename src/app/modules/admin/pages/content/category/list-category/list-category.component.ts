@@ -8,11 +8,10 @@ import {
     OnInit,
     ViewChild,
     ViewEncapsulation,
-    Pipe, PipeTransform,
     inject
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, Router, RouterLink, RouterOutlet, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet, RouterModule } from '@angular/router';
 
 import { DateTime } from 'luxon';
 import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
@@ -35,7 +34,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-
+import {MatGridListModule} from '@angular/material/grid-list';
 
 @Component({
     selector: 'list-category',
@@ -60,6 +59,7 @@ import { MatInputModule } from '@angular/material/input';
         FormsModule,
         ReactiveFormsModule,
         MatInputModule,
+        MatGridListModule,
         DatePipe
     ],
 })
@@ -296,5 +296,10 @@ export class CategoryListComponent implements OnInit, OnDestroy {
         // Show the alert
         this.showAlert = true;
         this.hideAlert();
+    }
+
+    showHideCardInfo(currentCategory:Category, flag:boolean) {
+        currentCategory.showCard = flag;
+        this._changeDetectorRef.markForCheck();
     }
 }
